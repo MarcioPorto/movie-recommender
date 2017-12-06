@@ -21,3 +21,7 @@ On local computer:
 ```
 python recommender.py
 ```
+
+## Requirements
+
+Make sure you have Java installed. For Ubuntu 16.04, I was able to install it by following [this guide](https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04).
