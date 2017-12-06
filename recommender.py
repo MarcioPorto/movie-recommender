@@ -9,10 +9,10 @@ def load_movie_names():
       as the value.
   """
   movie_names = dict()
-  with open("ml-100k/u.item") as f:
+  with open("ml-100k/u.item", encoding="ISO-8859-1") as f:
     for line in f:
       fields = line.split("|")
-      movie_names[int(fields[0])] = fields[1].decode("ascii", "ignore")
+      movie_names[int(fields[0])] = fields[1]
   return movie_names
 
 def parse_input(line):
