@@ -28,5 +28,24 @@ def parse_input(line):
 if __name__ == "__main__":
   spark = SparkSession.builder.appName("MovieRecommendations").getOrCreate()
 
+  movie_names = load_movie_names()
+
+  lines = spark.read.text("ml-100k/u.data").rdd
+
+  # Converts the input data into an RDD
+  ratings_rdd = lines.map(parse_input)
+
+  # Converts previous RDD into a dataframe
+  # This will be often reused, so it's a good idea to make sure it's cached
+  ratings = spark.createDataFrame(ratings_rdd).cache()
+
+  # ALS initialization
+  als = ALS(
+    maxIter=5, regParam=0.01, userCol="user_id", itemCol="movie_id", ratingCol="rating"
+  )
+
+  # Fit the model to the ratings data
+  model = als.fit(ratings)
+
   # Kill Spark session
   spark.stop()
