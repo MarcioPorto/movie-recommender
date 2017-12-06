@@ -28,6 +28,9 @@ def parse_input(line):
 if __name__ == "__main__":
   spark = SparkSession.builder.appName("MovieRecommendations").getOrCreate()
 
+  # Set log level
+  spark.sparkContext.setLogLevel("FATAL")
+
   movie_names = load_movie_names()
 
   lines = spark.read.text("ml-100k/u.data").rdd
@@ -45,7 +48,9 @@ if __name__ == "__main__":
   )
 
   # Fit the model to the ratings data
+  print("Starting to fit model.")
   model = als.fit(ratings)
+  print("Finished fitting model.")
 
   # Kill Spark session
   spark.stop()
