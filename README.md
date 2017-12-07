@@ -22,6 +22,8 @@ On local computer:
 python recommender.py
 ```
 
+For those who prefer, the `MovieRecommender.ipynb` file contains a Jupyter version of the code.
+
 ### Arguments
 
 You can pass in the id of the user who you want predictions for, by running:
