@@ -1,3 +1,5 @@
+import sys
+
 from pyspark.sql import SparkSession
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import Row
@@ -26,6 +28,12 @@ def parse_input(line):
   )
 
 if __name__ == "__main__":
+  # Get command line arguments
+  if len(sys.argv) == 2:
+    user = int(sys.argv[1])
+  else:
+    user = 1
+
   spark = SparkSession.builder.appName("MovieRecommendations").getOrCreate()
 
   # Set log level
@@ -48,13 +56,13 @@ if __name__ == "__main__":
   )
 
   # Fit the model to the ratings data
-  print("Starting to fit model.")
+  print("\nStarting to fit model...")
   model = als.fit(ratings)
   print("Finished fitting model.")
 
   # Print all ratings for the user
-  print("\nRatings for user ID 1:")
-  user_ratings = ratings.filter("user_id = 1")
+  print("\nRatings for user ID %s:" % user)
+  user_ratings = ratings.filter("user_id = %s" % user)
   for rating in user_ratings.collect():
     print(
       "%s - %s" % (
@@ -69,7 +77,7 @@ if __name__ == "__main__":
   # Run model on a list containing all movies rated more than 100 times
   print("\nRunning recommender...")
   recommendations = model.transform(
-    rating_counts.select("movie_id").withColumn("user_id", lit(1))
+    rating_counts.select("movie_id").withColumn("user_id", lit(user))
   )
 
   # Get the top 20 recommendations
@@ -78,7 +86,7 @@ if __name__ == "__main__":
   ).take(20)
 
   # Print these recommendations
-  print("\nTop 20 recommendations for user 1:")
+  print("\nTop 20 recommendations for user %s:" % user)
   for recommendation in top_recommendations:
     print(
       "%s - %s" % (
