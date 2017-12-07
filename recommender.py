@@ -52,5 +52,40 @@ if __name__ == "__main__":
   model = als.fit(ratings)
   print("Finished fitting model.")
 
+  # Print all ratings for the user
+  print("\nRatings for user ID 1:")
+  user_ratings = ratings.filter("user_id = 1")
+  for rating in user_ratings.collect():
+    print(
+      "%s - %s" % (
+        rating["rating"],
+        movie_names[rating["movie_id"]]
+      )
+    )
+
+  # Only pick movies that have been rated more than 100 times
+  rating_counts = ratings.groupBy("movie_id").count().filter("count > 100")
+
+  # Run model on a list containing all movies rated more than 100 times
+  print("\nRunning recommender...")
+  recommendations = model.transform(
+    rating_counts.select("movie_id").withColumn("user_id", lit(1))
+  )
+
+  # Get the top 20 recommendations
+  top_recommendations = recommendations.sort(
+    recommendations.prediction.desc()
+  ).take(20)
+
+  # Print these recommendations
+  print("\nTop 20 recommendations for user 1:")
+  for recommendation in top_recommendations:
+    print(
+      "%s - %s" % (
+        recommendation["prediction"], 
+        movie_names[recommendation["movie_id"]]
+      )
+    )
+
   # Kill Spark session
   spark.stop()
